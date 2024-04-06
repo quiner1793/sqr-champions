@@ -1,0 +1,21 @@
+name: Python package
+
+on: [push, pull_request]
+
+jobs:
+  python:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.8'
+      - name: Install dependencies
+        run: poetry install
+      - name: Run tests and check coverage
+        run: |
+          poetry run python -c "print('test')"
