@@ -9,13 +9,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11.4'
+          python-version: "3.11.4"
+          cache: "pip"
+        env:
+          AGENT_TOOLSDIRECTORY: /opt/hostedtoolcache
       - name: Run image
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: '1.8'
-      - name: Install dependencies
-        run: poetry install
-      - name: Run tests and check coverage
+      - name: Run tests print
         run: |
           poetry run python -c "print('test')"
