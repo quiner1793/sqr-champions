@@ -7,14 +7,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-          cache: "pip"
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: '1.8'
       - name: Run tests print
         run: |
-          poetry run python -c "print('test')"
+          docker images
