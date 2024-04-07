@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sqr-champions"
+version = "0.1.0"
+description = ""
+authors = ["Safina.AA <safina.aa@gazprom-neft.ru>"]
+readme = "README.md"
+packages = [{include = "sqr_champions"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+uvicorn = "^0.29.0"
+python-dotenv = "^1.0.1"
+fastapi = "^0.110.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
