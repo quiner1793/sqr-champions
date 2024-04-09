@@ -2,8 +2,8 @@ import sqlite3
 
 from fastapi import APIRouter, status, HTTPException
 from starlette.requests import Request
-from backend.entity import auth_requests
-from backend.entity.auth_responses import AuthResponse
+from entity import auth_requests
+from entity.auth_responses import AuthResponse
 
 router = APIRouter()
 
