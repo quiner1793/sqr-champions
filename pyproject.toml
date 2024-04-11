@@ -2,15 +2,18 @@
 name = "sqr-champions"
 version = "0.1.0"
 description = ""
-authors = ["Safina.AA <safina.aa@gazprom-neft.ru>"]
+authors = ["Lnsfna <alinasafina02@mail.ru>"]
 readme = "README.md"
 packages = [{include = "sqr_champions"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-uvicorn = "^0.29.0"
-python-dotenv = "^1.0.1"
 fastapi = "^0.110.1"
+fastapi-another-jwt-auth = "^0.1.10"
+validators = "^0.28.0"
+uvicorn = "^0.29.0"
+python-multipart = "^0.0.9"
+flake8 = "^7.0.0"
 
 
 [build-system]

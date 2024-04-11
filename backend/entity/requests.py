@@ -7,6 +7,8 @@ class RegisterRequest(BaseModel):
     email: str
 
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
+class AddFeedbackRequest(BaseModel):
+    link: str
+    title: str
+    platform: str
+    comment: str

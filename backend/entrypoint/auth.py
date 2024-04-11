@@ -1,55 +1,75 @@
 import sqlite3
+from datetime import timedelta
 
 from fastapi import APIRouter, status, HTTPException
 from starlette.requests import Request
-from backend.entity import auth_requests
-from backend.entity.auth_responses import AuthResponse
+from backend.entity import requests
+from backend.entity.responses import StandardResponse
+from backend.entity.token import Token
+from backend.gateway.user_gw import UserGw
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends
+from fastapi_another_jwt_auth import AuthJWT
+from backend.config import config
+import validators
+import logging
 
 router = APIRouter()
 
 
-@router.post("/login", summary="Login", response_model=AuthResponse)
+@router.post("/token", response_model=Token, include_in_schema=False)
 async def login(
-        body: auth_requests.LoginRequest,
-        request: Request) -> AuthResponse:
-    con = request.app.state.db
-    cursor = con.cursor()
+        request: Request,
+        form: OAuth2PasswordRequestForm = Depends(),
+        authorize: AuthJWT = Depends(),
+):
+    userGw = UserGw(request.app.state.db)
     try:
-        cursor.execute('SELECT * FROM Users WHERE username = ? AND password = ?',
-                       (body.username, body.password))
-        user = cursor.fetchone()
-        if user is None:
-            return AuthResponse(success=False, error="No such user")
-        return AuthResponse(success=True, error="")
-
-    except sqlite3.Error:
+        user = await userGw.get_user(form)
+    except Exception:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid username or password",
         )
 
+    access_token = authorize.create_access_token(
+        subject=user.username,
+        expires_time=timedelta(minutes=config.auth_token_expire).seconds,
+    )
+    refresh_token = authorize.create_refresh_token(
+        subject=user.username,
+        expires_time=timedelta(
+            minutes=config.auth_refresh_token_expire).seconds
+    )
 
-@router.post("/register", summary="Register", response_model=AuthResponse)
+    return Token(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/register", summary="Register", response_model=StandardResponse)
 async def register(
-        body: auth_requests.RegisterRequest,
+        body: requests.RegisterRequest,
         request: Request,
-) -> AuthResponse:
-    con = request.app.state.db
-    cursor = con.cursor()
+) -> StandardResponse:
+    if not validators.email(body.email):
+        return StandardResponse(success=False, error="Invalid email")
+
+    userGw = UserGw(request.app.state.db)
+
     try:
-        cursor.execute('INSERT INTO Users (username, password, email) '
-                       'VALUES (?, ?, ?)',
-                       (body.username, body.password, body.email))
-
-        con.commit()
-
+        await userGw.add_user(body)
     except sqlite3.Error as err:
         if err.sqlite_errorcode == sqlite3.SQLITE_CONSTRAINT_UNIQUE:
             field = str(err).replace("UNIQUE constraint failed: Users.", "")
             msg = f"Person with such {field} is already registered"
-            return AuthResponse(success=False, error=msg)
+            return StandardResponse(success=False, error=msg)
         else:
+            logging.error(f"error in register user: {err}")
             raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    return AuthResponse(success=True, error="")
+    return StandardResponse(success=True, error="")
