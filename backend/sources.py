@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from config import Config
+from backend.config import Config
 import sqlite3
 
 
