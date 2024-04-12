@@ -4,7 +4,8 @@ from zoneinfo import ZoneInfo
 from backend.gateway.db_gw import DatabaseGw
 from backend.entity.feedback import Feedback
 
-FORMAT = "%Y-%m-%d %H:%M:%S"
+FEEDBACK_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT = "%Y-%m-%d"
 
 
 class FeedbackGw(DatabaseGw):
@@ -15,7 +16,7 @@ class FeedbackGw(DatabaseGw):
                             (feedback_data.user_id,
                              feedback_data.link_id,
                              feedback_data.comment,
-                             datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(FORMAT)))  # noqa: E501
+                             datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(FEEDBACK_DATETIME_FORMAT)))  # noqa: E501
         self.con.commit()
 
     async def get_feedback_by_id(self, feedback_id: int):
@@ -33,6 +34,19 @@ class FeedbackGw(DatabaseGw):
     async def get_feedback_list(self, link_id: int):
         self.cursor.execute('SELECT * FROM Feedback '
                             'WHERE link_id = ?', (str(link_id),))
+        result = self.cursor.fetchall()
+        feedback_list = []
+        for feedback in result:
+            feedback_list.append(Feedback(id=feedback[0],
+                                          user_id=feedback[1],
+                                          link_id=feedback[2],
+                                          comment=feedback[3],
+                                          date=feedback[4]))
+        return feedback_list
+
+    async def get_latest_feedback(self, limit: int):
+        self.cursor.execute('SELECT * FROM Feedback '
+                            'ORDER BY id DESC LIMIT ?', (str(limit),))
         result = self.cursor.fetchall()
         feedback_list = []
         for feedback in result:

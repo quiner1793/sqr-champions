@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter
 
 from backend.gateway.feedback_gw import FeedbackGw
@@ -88,12 +90,17 @@ async def get_feedback(
             summary="search feedback",
             response_model=FeedbackListResponse)
 async def search_feedback(
-        query: str,
-        url: bool,
         request: Request,
+        url: Optional[bool] = None,
+        query: Optional[str] = None,
+        limit: Optional[int] = 10,
 ) -> FeedbackListResponse:
     feedbackGw = FeedbackGw(request.app.state.db)
     linkGw = LinkGw(request.app.state.db)
+
+    if query is None:
+        result = await feedbackGw.get_latest_feedback(limit)
+        return FeedbackListResponse(success=len(result) > 0, feedback=result)
 
     if url:
         query = query.replace("%3A", ":")
