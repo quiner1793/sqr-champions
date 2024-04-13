@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from backend.entity.feedback import Feedback
 from backend.entity.feedback import FeedbackPage
+from backend.entity.user import User
 
 
 class StandardResponse(BaseModel):
@@ -17,3 +18,8 @@ class FeedbackListResponse(BaseModel):
 class FeedbackResponse(BaseModel):
     success: bool
     feedback: Optional[FeedbackPage] = None
+
+
+class UserInfoResponse(BaseModel):
+    success: bool
+    user: User
