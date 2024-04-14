@@ -4,7 +4,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 from frontend.NetworkService import *
-from frontend.SessionService import *
 
 
 def auth_ui():
@@ -24,9 +23,6 @@ def auth_ui():
         if login_button:
             tokens = login(login_username, login_password)
             if tokens[0]:
-                set_access_token(tokens[1])
-                set_refresh_token(tokens[2])
-
                 st.rerun()
             else:
                 st.error(tokens[1])
@@ -41,15 +37,10 @@ def auth_ui():
         if reg_button:
             result = register(email=reg_email, username=reg_username, password=reg_password)
             if result[0]:
-
-                set_access_token(result)
                 st.success("You have successfully registered!")
 
                 tokens = login(reg_username, reg_password)
                 if tokens[0]:
-                    set_access_token(tokens[1])
-                    set_refresh_token(tokens[2])
-
                     st.rerun()
                 else:
                     st.error(tokens[1])
@@ -60,6 +51,23 @@ def auth_ui():
 
 def profile_ui():
     st.title('Profile')
+
+    data = get_user_info()
+    if data[0]:
+        username = data[1]["username"]
+        password = data[1]["password"]
+        email = data[1]["email"]
+
+        st.write("### Username:")
+        st.write(username)
+
+        st.write("### Password:")
+        st.write(password)
+
+        st.write("### Email:")
+        st.write(email)
+    else:
+        st.error(data[1])
 
 
 if get_access_token():
