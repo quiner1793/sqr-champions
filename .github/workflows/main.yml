@@ -7,6 +7,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      - name: Run tests print
+      - name: Build image
         run: |
-          docker images
+          docker compose build
+      - name: Run images
+        run: |
+          docker compose up
