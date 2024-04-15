@@ -12,9 +12,11 @@ fastapi = "^0.110.1"
 fastapi-another-jwt-auth = "^0.1.10"
 validators = "^0.28.0"
 uvicorn = "^0.29.0"
+gunicorn = "^21.2.0"
 python-multipart = "^0.0.9"
-flake8 = "^7.0.0"
 
+[tool.poetry.dev-dependencies]
+flake8 = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
