@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Lnsfna <alinasafina02@mail.ru>"]
 readme = "README.md"
-packages = [{include = "sqr_champions"}]
+packages = []
 
 [tool.poetry.dependencies]
 python = "^3.12"
