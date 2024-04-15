@@ -13,5 +13,6 @@ jobs:
       - name: Run images
         env:
           AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
+          DB_NAME: ${{ secrets.DB_NAME }}
         run: |
           docker compose up -d
