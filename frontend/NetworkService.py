@@ -31,3 +31,6 @@ def get_user_info():
         return response.json()["success"], response.json()["user"]
 
     return False, response.json()["detail"]
+
+
+# def search()
