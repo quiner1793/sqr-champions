@@ -4,6 +4,15 @@ access_token_key = "access_token"
 refresh_token_key = "refresh_token"
 
 
+class MainPageState:
+    SEARCH = 0
+    NEWTHREAD = 1
+    THREADDETAIL = 2
+
+
+main_page_state = MainPageState.THREADDETAIL
+
+
 def set_access_token(token: str):
     st.session_state[access_token_key] = token
 
