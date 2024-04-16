@@ -11,7 +11,8 @@ from backend.entity.responses import UserInfoResponse
 router = APIRouter()
 
 
-@router.get("/get_info", summary="get user info", response_model=UserInfoResponse)
+@router.get("/get_info", summary="get user info",
+            response_model=UserInfoResponse)
 async def get_user_info(
         request: Request,
         user: User = Security(get_current_user)
@@ -25,4 +26,3 @@ async def get_user_info(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     return UserInfoResponse(success=True, user=user)
-

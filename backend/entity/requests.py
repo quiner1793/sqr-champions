@@ -7,8 +7,18 @@ class RegisterRequest(BaseModel):
     email: str
 
 
-class AddFeedbackRequest(BaseModel):
+class CreateThreadRequest(BaseModel):
     link: str
     title: str
     platform: str
+    comment: str
+
+
+class AddFeedbackRequest(BaseModel):
+    link_id: int
+    comment: str
+
+
+class EditFeedbackRequest(BaseModel):
+    feedback_id: int
     comment: str

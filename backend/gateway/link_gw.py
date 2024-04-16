@@ -46,3 +46,15 @@ class LinkGw(DatabaseGw):
                                title=link[2],
                                platform=link[3]))
         return result
+
+    async def get_latest(self, limit: int):
+        self.cursor.execute('SELECT * FROM Links '
+                            'ORDER BY id DESC LIMIT ?', (str(limit),))
+        links_data = self.cursor.fetchall()
+        result = []
+        for link in links_data:
+            result.append(Link(id=link[0],
+                               link=link[1],
+                               title=link[2],
+                               platform=link[3]))
+        return result

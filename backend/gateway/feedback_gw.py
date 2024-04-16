@@ -16,7 +16,8 @@ class FeedbackGw(DatabaseGw):
                             (feedback_data.user_id,
                              feedback_data.link_id,
                              feedback_data.comment,
-                             datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(FEEDBACK_DATETIME_FORMAT)))  # noqa: E501
+                             datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(  # noqa: E501
+                                 FEEDBACK_DATETIME_FORMAT)))  # noqa: E501
         self.con.commit()
 
     async def get_feedback_by_id(self, feedback_id: int):
@@ -56,3 +57,8 @@ class FeedbackGw(DatabaseGw):
                                           comment=feedback[3],
                                           date=feedback[4]))
         return feedback_list
+
+    async def update_feedback(self, feedback_id: int, comment: str):
+        self.cursor.execute('UPDATE Feedback SET comment = ? WHERE id = ?',
+                            (comment, str(feedback_id)))
+        self.con.commit()

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter
 
 from backend.gateway.feedback_gw import FeedbackGw
@@ -13,7 +11,6 @@ from backend.entity import requests
 from backend.entity.feedback import Feedback
 from backend.entity.feedback import FeedbackPage
 from backend.entity.responses import StandardResponse
-from backend.entity.responses import FeedbackListResponse
 from backend.entity.responses import FeedbackResponse
 import logging
 
@@ -27,33 +24,21 @@ async def add_feedback(
         user: User = Security(get_current_user)
 ) -> StandardResponse:
     userGw = UserGw(request.app.state.db)
-    linkGw = LinkGw(request.app.state.db)
     feedbackGw = FeedbackGw(request.app.state.db)
 
     user_data = await userGw.get_user_by_username(user.username)
-    link_data = await linkGw.get_link_data_by_link(body.link)
 
-    if link_data is None:
-        try:
-            link_id = await linkGw.add_link(body)
-        except Exception as e:
-            logging.error(f"error in inserting link: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-    else:
-        link_id = link_data.id
     try:
         await feedbackGw.add_feedback(Feedback(user_id=user_data.id,
-                                               link_id=link_id,
+                                               link_id=body.link_id,
                                                comment=body.comment))
+        return StandardResponse(success=True, error="")
+
     except Exception as e:
         logging.error(f"error in inserting feedback: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-    return StandardResponse(success=True, error="")
 
 
 @router.get("/get/{feedback_id}",
@@ -86,52 +71,28 @@ async def get_feedback(
     return FeedbackResponse(success=True, feedback=feedbackPage)
 
 
-@router.get("/search/",
-            summary="search feedback",
-            response_model=FeedbackListResponse)
-async def search_feedback(
+@router.post("/edit", summary="edit feedback", response_model=StandardResponse)
+async def edit_feedback(
+        body: requests.EditFeedbackRequest,
         request: Request,
-        url: Optional[bool] = None,
-        query: Optional[str] = None,
-        limit: Optional[int] = 10,
-) -> FeedbackListResponse:
+        user: User = Security(get_current_user)
+) -> StandardResponse:
     feedbackGw = FeedbackGw(request.app.state.db)
-    linkGw = LinkGw(request.app.state.db)
+    userGw = UserGw(request.app.state.db)
 
-    if query is None:
-        result = await feedbackGw.get_latest_feedback(limit)
-        return FeedbackListResponse(success=len(result) > 0, feedback=result)
+    feedback = await feedbackGw.get_feedback_by_id(body.feedback_id)
+    user_data = await userGw.get_user_by_username(user.username)
+    if feedback.user_id != user_data.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
 
-    if url:
-        query = query.replace("%3A", ":")
-        query = query.replace("%2F", "/")
+    try:
+        await feedbackGw.update_feedback(body.feedback_id, body.comment)
+        return StandardResponse(success=True, error="")
 
-        # Search link by url
-        link_data = await linkGw.get_link_data_by_link(query)
-        if link_data is None:
-            return FeedbackListResponse(success=False, feedback=[])
-        try:
-            result = await feedbackGw.get_feedback_list(link_data.id)
-        except Exception as e:
-            logging.error(f"error in getting link feedback: {e}")
-
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        return FeedbackListResponse(success=True, feedback=result)
-    else:
-        # Search urls by matches in platform or title strings
-        links = await linkGw.get_links_by_query(query)
-        if not links:
-            return FeedbackListResponse(success=False, feedback=[])
-        results = []
-        for link in links:
-            try:
-                result = await feedbackGw.get_feedback_list(link.id)
-                results.extend(result)
-            except Exception as e:
-                logging.error(f"error in getting feedback: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-        return FeedbackListResponse(success=True, feedback=results)
+    except Exception as e:
+        logging.error(f"error in editing feedback: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
