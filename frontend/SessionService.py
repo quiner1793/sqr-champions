@@ -10,9 +10,9 @@ class MainPageState(Enum):
     THREAD_DETAIL = 2
 
 
-main_page_state = MainPageState.THREAD_DETAIL
+main_page_state = MainPageState.SEARCH
 
-searchResults: [NetworkService.SearchThread] = NetworkService.search(False, "a")
+searchResults: [NetworkService.SearchThread] = NetworkService.search(False, "")
 
 access_token_key = "access_token"
 refresh_token_key = "refresh_token"
