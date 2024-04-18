@@ -1,12 +1,13 @@
 from pydantic import BaseModel
+from typing import Optional
 from backend.entity.link import Link
 from backend.entity.feedback import Feedback
 
 
 class Thread(BaseModel):
-    username: str
-    link: Link
-    date: str
+    username: Optional[str]
+    link: Optional[Link]
+    date: Optional[str]
 
 
 class ThreadFeedback(BaseModel):

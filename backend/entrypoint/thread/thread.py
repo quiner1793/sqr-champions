@@ -34,7 +34,16 @@ async def search(
     userGw = UserGw(request.app.state.db)
 
     if query is None:
-        result = await linkGw.get_latest(limit)
+        links = await linkGw.get_latest(limit)
+        result = []
+        if len(links) > 0:
+            for link in links:
+                feedback = await feedbackGw.get_first_feedback(link.id)
+                username = await userGw.get_username_by_id(feedback.user_id)
+                result.append(Thread(username=username,
+                                     link=link,
+                                     date=feedback.date))
+
         return ThreadResponse(success=len(result) > 0, threads=result)
 
     if url:
@@ -44,11 +53,12 @@ async def search(
         # Search link by url
         try:
             link_data = await linkGw.get_link_data_by_link(query)
-            feedback = await feedbackGw.get_first_feedback(link_data.id)
-            username = await userGw.get_username_by_id(feedback.user_id)
 
             if link_data is None:
                 return ThreadResponse(success=False, threads=[])
+
+            feedback = await feedbackGw.get_first_feedback(link_data.id)
+            username = await userGw.get_username_by_id(feedback.user_id)
 
         except Exception as e:
             logging.error(f"error in getting link: {e}")
