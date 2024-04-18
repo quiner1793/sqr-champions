@@ -117,4 +117,15 @@ def add_feedback(link_id, comment) -> (bool, str):
 
     return response.json()["success"], response.json()["error"]
 
-def 
+
+def edit_feedback(feedback_id, comment) -> (bool, str):
+    payload = json.dumps({
+        "feedback_id": feedback_id,
+        "comment": comment
+    })
+
+    response = requests.post(f"{API_URL}/thread/feedback/edit",
+                             data=payload,
+                             headers={"Authorization": f"Bearer {SessionService.get_access_token()}"})
+
+    return response.json()["success"], response.json()["error"]

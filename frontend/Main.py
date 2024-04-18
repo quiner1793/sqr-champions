@@ -132,7 +132,14 @@ def comments(thread: Thread) -> None:
             edited_text = st.text_area("Feedback", comment.comment, key=f"edited_text_area_{index}")
             if st.button("Submit", key=f'submit_{index}'):
                 thread.comments[index].comment = edited_text
-                st.success("Feedback edited successfully!")
+
+                response = NetworkService.edit_feedback(comment.id, edited_text)
+
+                if response[0]:
+                    st.success("Feedback edited successfully!")
+                    st.rerun()
+                else:
+                    st.error(response[1])
 
         st.write(f"_{comment.date}_")
         st.write("---")
