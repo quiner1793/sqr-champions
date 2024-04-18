@@ -1,8 +1,11 @@
-import random
+import time
 
 import streamlit as st
-from SessionService import MainPageState
+from SessionService import MainPageState, searchResults, Thread, selectedThread
+from NetworkService import create_thread, search, get_thread_details
 import SessionService
+
+import NetworkService
 
 
 def search_ui():
@@ -15,53 +18,59 @@ def search_ui():
     # Вторая колонка для кнопки
     with col2:
         if st.button('Create new thread'):
-            SessionService.main_page_state = MainPageState.NEWTHREAD
+            SessionService.main_page_state = MainPageState.NEW_THREAD
             st.rerun()
 
     search_query = st.text_input("Enter URLs or keywords to search", key="search")
 
     search_button = st.button("Find")
 
-    results = [
-        {"title": "Test1", "URL": "https://telegram", "Platform": "telegram", "date": "21.0.1123"},
-        {"title": "Test2", "URL": "https://telegram", "Platform": "telegram", "date": "21.0.1123"},
-        {"title": "Test3", "URL": "https://telegram", "Platform": "telegram", "date": "21.0.1123"},
-        {"title": "Test4", "URL": "https://telegram", "Platform": "telegram", "date": "21.0.1123"},
-    ]
     # Отображение результатов
-    if results:
-        for index, feedback in enumerate(results):
+    if searchResults:
+        for index, feedback in enumerate(searchResults):
             st.markdown(f" ### {feedback['title']}")
-            st.markdown(f" ##### {feedback['URL']}")
+            st.markdown(f" ##### {feedback['link']}")
 
-            st.write(f"{feedback['Platform']}")
+            st.write(f"{feedback['platform']}")
 
             col1, col2 = st.columns([0.75, 0.25])
             with col1:
-                st.write(f"{feedback['date']}")
+                # TODO: Date
+                st.write(f"ДАТА")
+                # st.write(f"{feedback['date']}")
             with col2:
                 if st.button('Show thread', key=f"thread_{index}"):  # ID THREAD
-                    SessionService.main_page_state = MainPageState.THREADDETAIL
+                    SessionService.main_page_state = MainPageState.THREAD_DETAIL
+                    # TODO data
+                    SessionService.selectedThread = Thread(feedback["id"],
+                                                           feedback["link"],
+                                                           feedback["platform"],
+                                                           feedback["title"],
+                                                           "Author", "DATA")
                     st.rerun()
             st.markdown("---")
     else:
-        st.write("Результаты не найдены.")
+        st.write("No results were found :(")
 
     if search_button:
-        pass
-        # Отправка запроса на сервер и получение результатов
-        # results = search_feedback(search_query)
-
+        SessionService.searchResults = search(False, query=search_query)
+        st.rerun()
 
 
 def new_thread():
     def create_new_thread(url, platform, content_title, comment):
-        # Здесь можно добавить код для сохранения нового треда в базу данных или куда там тебе надо
-        st.success("Новый тред успешно создан!")
-        st.write("URL:", url)
-        st.write("Платформа:", platform)
-        st.write("Название контента:", content_title)
-        st.write("Комментарий:", comment)
+        response = create_thread(url, content_title, platform, comment)
+
+        if response[0]:
+            st.success("Thread created!")
+            time.sleep(0.5)
+            SessionService.main_page_state = MainPageState.THREAD_DETAIL
+
+            # TODO createThread
+            SessionService.selectedThread = Thread(0, url, platform, content_title, "Me", "123")
+            st.rerun()
+        else:
+            st.error(response[1])
 
     if st.button('Back'):
         SessionService.main_page_state = MainPageState.SEARCH
@@ -77,74 +86,82 @@ def new_thread():
     if st.button("Создать"):
         if url and platform and content_title and comment:
             create_new_thread(url, platform, content_title, comment)
-            SessionService.main_page_state = MainPageState.THREADDETAIL
-            st.rerun()
         else:
             st.warning("Пожалуйста, заполните все поля!")
 
 
-def thread_detail_ui():
-    def show_thread_detail(url, platform, content_title, author, date, comments):
-        if st.button('Back'):
-            SessionService.main_page_state = MainPageState.SEARCH
+def thread_title(thread: Thread) -> None:
+    st.title(thread.content_title)
+
+    st.write(f"**{thread.platform}:** ", thread.url)
+
+    col1, col2 = st.columns([0.75, 0.25])
+    with col1:
+        st.write("**Author:**", thread.author)
+    with col2:
+        st.write(f"_{thread.date}_")
+
+
+def feedback_title(thread: Thread) -> None:
+    st.subheader("Feedback:")
+
+    sort_order = st.radio("Сортировка:", ("По возрастанию даты", "По убыванию даты"))
+    if sort_order == "По возрастанию даты":
+        thread.comments.sort(key=lambda x: x["date"])
+    else:
+        thread.comments.sort(key=lambda x: x["date"], reverse=True)
+
+    comment = st.text_area("Feedback", "")
+
+    if st.button("Submit"):
+        response = NetworkService.add_feedback(thread.link_id, comment)
+
+        if response[0]:
             st.rerun()
-
-        st.title(content_title)
-
-        st.write(f"**{platform}:** ", url)
-
-        col1, col2 = st.columns([0.75, 0.25])
-        with col1:
-            st.write("**Автор:**", author)
-        with col2:
-            st.write(f"_{date}_")
-
-        st.subheader("Комментарии:")
-
-        sort_order = st.radio("Сортировка:", ("По возрастанию даты", "По убыванию даты"))
-        if sort_order == "По возрастанию даты":
-            comments.sort(key=lambda x: x["date"])
         else:
-            comments.sort(key=lambda x: x["date"], reverse=True)
+            st.error(response[1])
 
-        if st.button('New feedback'):
-            st.text_area("Feedback", "")
-            st.button("Submit")
+    st.write("---")
 
-        # st.subheader("")
+
+def comments(thread: Thread) -> None:
+    for index, comment in enumerate(thread.comments):
+        # TODO author
+        # st.write(f"**{ comment['author'] }**: {comment['text']}")
+
+        st.write(f"**AUTHOR**: {comment['comment']}")
+
+        if st.button(f'Edit feedback', key=f'edit_feedback_{index}'):
+            edited_text = st.text_area("Feedback", comment["comment"])
+            if st.button("Submit"):
+                thread.comments[index]["comment"] = edited_text
+                st.success("Feedback edited successfully!")
+
+        st.write(f"_{comment['date']}_")
         st.write("---")
 
-        for index, comment in enumerate(comments):
-            st.write(f"**{comment['author']}**: {comment['text']}")
 
-            if st.button(f'Edit feedback', key=f'edit_feedback_{index}'):
-                edited_text = st.text_area("Feedback", comment["text"])
-                if st.button("Submit"):
-                    comments[index]["text"] = edited_text
-                    st.success("Feedback edited successfully!")
+def thread_detail_ui(thread: Thread) -> None:
+    if st.button('Back'):
+        SessionService.main_page_state = MainPageState.SEARCH
+        st.rerun()
 
-            st.write(f"_{comment['date']}_")
-            st.write("---")
+    if thread:
+        thread.comments = NetworkService.get_thread_details(thread.link_id)
 
-    # Пример данных для отображения
-    url = "https://moodle.innopolis.university/login/index.php#section-1"
-    platform = "YouTube"
-    content_title = "Как выжить на необитаемом острове"
-    author = "SurvivorGuy1987"
-    date = "2024-04-15"
-    comments = [
-        {"author": "Commenter1", "text": "Крутой контент!", "date": "2024-04-16"},
-        {"author": "Commenter2", "text": "Я бы поступил иначе.", "date": "2024-04-17"},
-        {"author": "Commenter3", "text": "Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале? Супер, а что за музыка в начале?" , "date": "2024-04-18"}
-    ]
+        thread_title(thread)
 
-    # Показываем информацию о треде
-    show_thread_detail(url, platform, content_title, author, date, comments)
+        feedback_title(thread)
+
+        comments(thread)
+
+    else:
+        st.error("No selected Thread")
 
 
 if SessionService.main_page_state == MainPageState.SEARCH:
     search_ui()
-elif SessionService.main_page_state == MainPageState.NEWTHREAD:
+elif SessionService.main_page_state == MainPageState.NEW_THREAD:
     new_thread()
-elif SessionService.main_page_state == MainPageState.THREADDETAIL:
-    thread_detail_ui()
+elif SessionService.main_page_state == MainPageState.THREAD_DETAIL:
+    thread_detail_ui(SessionService.selectedThread)
