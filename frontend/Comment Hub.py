@@ -4,6 +4,8 @@ import streamlit as st
 from SessionService import MainPageState, searchResults, Thread, selectedThread
 from NetworkService import create_thread, search, get_thread_details
 import SessionService
+import validators
+
 
 import NetworkService
 
@@ -29,7 +31,7 @@ def search_ui():
     if len(searchResults) > 0:
         for index, feedback in enumerate(searchResults):
             st.markdown(f" ### {feedback.title}")
-            st.markdown(f" ##### {feedback.link_id}")
+            st.markdown(f" ##### {feedback.link}")
 
             st.write(f"{feedback.platform}")
 
@@ -52,7 +54,11 @@ def search_ui():
         st.write("No results were found :(")
 
     if search_button:
-        SessionService.searchResults = search(False, query=search_query)
+        print(search_query)
+        if validators.url(search_query):
+            SessionService.searchResults = search(True, query=search_query)
+        else:
+            SessionService.searchResults = search(False, query=search_query)
         st.rerun()
 
 
@@ -78,11 +84,15 @@ def new_thread():
     st.title("Создание нового треда")
 
     url = st.text_input("URL", "")
-    platform = st.selectbox("Платформа", ["YouTube", "Twitch", "Instagram", "Twitter"])
-    content_title = st.text_input("Название контента", "")
+
+    # platform = st.selectbox("Платформа", ["YouTube", "Twitch", "Instagram", "Twitter"])
+    # content_title = st.text_input("Название контента", "")
     comment = st.text_area("Комментарий", "")
 
     if st.button("Создать"):
+
+        platform, content_title = NetworkService.get_content_details_from_url(url)
+
         if url and platform and content_title and comment:
             create_new_thread(url, platform, content_title, comment)
         else:
@@ -109,7 +119,6 @@ def feedback_title(thread: Thread) -> None:
         thread.comments.sort(key=lambda x: x.date)
     else:
         thread.comments.sort(key=lambda x: x.date, reverse=True)
-
     comment = st.text_area("Feedback", "")
 
     if st.button("Submit"):
@@ -129,7 +138,7 @@ def comments(thread: Thread) -> None:
         st.write(f"**{comment.username}**: {comment.comment}")
 
         if comment.user_id == SessionService.get_id():
-            edited_text = st.text_area("Feedback", comment.comment, key=f"edited_text_area_{index}")
+            edited_text = st.text_area("Edit", comment.comment, key=f"edited_text_area_{index}")
             if st.button("Submit", key=f'submit_{index}'):
                 thread.comments[index].comment = edited_text
 

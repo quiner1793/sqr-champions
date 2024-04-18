@@ -1,7 +1,9 @@
 import json
+import re
 
 import requests
 import SessionService
+from bs4 import BeautifulSoup
 
 API_URL = "http://127.0.0.1:8080"
 
@@ -129,3 +131,22 @@ def edit_feedback(feedback_id, comment) -> (bool, str):
                              headers={"Authorization": f"Bearer {SessionService.get_access_token()}"})
 
     return response.json()["success"], response.json()["error"]
+
+
+def get_content_details_from_url(url):
+    # Отправляем запрос к указанной URL и получаем содержимое страницы
+    response = requests.get(url)
+    # Проверяем успешность запроса
+    if response.status_code == 200:
+        # Используем BeautifulSoup для парсинга HTML
+        soup = BeautifulSoup(response.content, 'html.parser')
+        # Находим необходимые элементы на странице и извлекаем данные
+        unique_id = url  # Уникальный ID можно использовать как саму URL
+        platform = re.search(r'(?<=://)(.*?)(?=/|$)', url).group(0)  # Платформа извлекается из URL
+        name = soup.title.text.strip()  # Название контента из заголовка страницы
+        # Возвращаем полученные данные
+        return platform, name
+    else:
+        # Если запрос неудачный, выводим сообщение об ошибке
+        print("Failed to fetch content from URL:", url)
+        return None
