@@ -6,6 +6,26 @@ import SessionService
 API_URL = "http://127.0.0.1:8080"
 
 
+class SearchThread:
+    def __init__(self, thread_json):
+        self.username = thread_json["username"]
+        self.link_id = thread_json["link"]["id"]
+        self.link = thread_json["link"]["link"]
+        self.title = thread_json["link"]["title"]
+        self.platform = thread_json["link"]["platform"]
+        self.date = thread_json["date"]
+
+
+class Feedback:
+    def __init__(self, feedback_json):
+        self.username = feedback_json["username"]
+        self.id = feedback_json["feedback"]["id"]
+        self.user_id = feedback_json["feedback"]["user_id"]
+        self.link_id = feedback_json["feedback"]["link_id"]
+        self.comment = feedback_json["feedback"]["comment"]
+        self.date = feedback_json["feedback"]["date"]
+
+
 def register(email, username, password) -> (bool, str):
     response = requests.post(f"{API_URL}/auth/register",
                              json={"email": email, "username": username, "password": password})
@@ -56,22 +76,30 @@ def create_thread(link: str, title: str, platform: str, comment: str):
     return response.json()["success"], response.json()["error"]
 
 
-def search(url: bool, query: str):
+def search(url: bool, query: str) -> [SearchThread]:
     if query:
         response = requests.get(f"{API_URL}/thread/search?url={url}&query={query}&limit=100")
     else:
         response = requests.get(f"{API_URL}/thread/search?limit=100")
 
-    return response.json()['threads']
+    res = []
+    for thread in response.json()["threads"]:
+        res.append(SearchThread(thread))
+
+    return res
 
 
-def get_thread_details(link_id):
+def get_thread_details(link_id) -> [Feedback]:
     response = requests.get(f"{API_URL}/thread/get/{link_id}")
 
-    return response.json()["feedback"]
+    res = []
+    for feedback in response.json()["feedback"]:
+        res.append(Feedback(feedback))
+
+    return res
 
 
-def add_feedback(link_id, comment):
+def add_feedback(link_id, comment) -> (bool, str):
     payload = json.dumps({
         "link_id": link_id,
         "comment": comment
@@ -88,3 +116,5 @@ def add_feedback(link_id, comment):
         pass
 
     return response.json()["success"], response.json()["error"]
+
+def 

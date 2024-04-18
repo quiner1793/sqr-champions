@@ -26,27 +26,26 @@ def search_ui():
     search_button = st.button("Find")
 
     # Отображение результатов
-    if searchResults:
+    if len(searchResults) > 0:
         for index, feedback in enumerate(searchResults):
-            st.markdown(f" ### {feedback['title']}")
-            st.markdown(f" ##### {feedback['link']}")
+            st.markdown(f" ### {feedback.title}")
+            st.markdown(f" ##### {feedback.link_id}")
 
-            st.write(f"{feedback['platform']}")
+            st.write(f"{feedback.platform}")
 
             col1, col2 = st.columns([0.75, 0.25])
             with col1:
-                # TODO: Date
-                st.write(f"ДАТА")
-                # st.write(f"{feedback['date']}")
+                st.write(f"{feedback.date}")
             with col2:
                 if st.button('Show thread', key=f"thread_{index}"):  # ID THREAD
                     SessionService.main_page_state = MainPageState.THREAD_DETAIL
-                    # TODO data
-                    SessionService.selectedThread = Thread(feedback["id"],
-                                                           feedback["link"],
-                                                           feedback["platform"],
-                                                           feedback["title"],
-                                                           "Author", "DATA")
+
+                    SessionService.selectedThread = Thread(feedback.link_id,
+                                                           feedback.link,
+                                                           feedback.platform,
+                                                           feedback.title,
+                                                           feedback.username,
+                                                           feedback.date)
                     st.rerun()
             st.markdown("---")
     else:
@@ -107,9 +106,9 @@ def feedback_title(thread: Thread) -> None:
 
     sort_order = st.radio("Сортировка:", ("По возрастанию даты", "По убыванию даты"))
     if sort_order == "По возрастанию даты":
-        thread.comments.sort(key=lambda x: x["date"])
+        thread.comments.sort(key=lambda x: x.date)
     else:
-        thread.comments.sort(key=lambda x: x["date"], reverse=True)
+        thread.comments.sort(key=lambda x: x.date, reverse=True)
 
     comment = st.text_area("Feedback", "")
 
@@ -126,18 +125,16 @@ def feedback_title(thread: Thread) -> None:
 
 def comments(thread: Thread) -> None:
     for index, comment in enumerate(thread.comments):
-        # TODO author
-        # st.write(f"**{ comment['author'] }**: {comment['text']}")
 
-        st.write(f"**AUTHOR**: {comment['comment']}")
+        st.write(f"**{comment.username}**: {comment.comment}")
 
-        if st.button(f'Edit feedback', key=f'edit_feedback_{index}'):
-            edited_text = st.text_area("Feedback", comment["comment"])
-            if st.button("Submit"):
-                thread.comments[index]["comment"] = edited_text
+        if comment.user_id == SessionService.get_id():
+            edited_text = st.text_area("Feedback", comment.comment, key=f"edited_text_area_{index}")
+            if st.button("Submit", key=f'submit_{index}'):
+                thread.comments[index].comment = edited_text
                 st.success("Feedback edited successfully!")
 
-        st.write(f"_{comment['date']}_")
+        st.write(f"_{comment.date}_")
         st.write("---")
 
 

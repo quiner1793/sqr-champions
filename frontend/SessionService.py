@@ -1,10 +1,7 @@
 from enum import Enum
 
 import streamlit as st
-from NetworkService import search
-
-access_token_key = "access_token"
-refresh_token_key = "refresh_token"
+import NetworkService
 
 
 class MainPageState(Enum):
@@ -15,11 +12,15 @@ class MainPageState(Enum):
 
 main_page_state = MainPageState.THREAD_DETAIL
 
-searchResults = search(False, "")
+searchResults: [NetworkService.SearchThread] = NetworkService.search(False, "a")
+
+access_token_key = "access_token"
+refresh_token_key = "refresh_token"
+id_key = "user_id"
 
 
 class Thread:
-    comments = []
+    comments: [NetworkService.Feedback] = []
 
     def __init__(self, link_id: int, url: str, platform: str, content_title: str, author: str, date: str):
         self.link_id = link_id
@@ -39,6 +40,15 @@ def set_access_token(token: str):
 
 def set_refresh_token(token: str):
     st.session_state[refresh_token_key] = token
+
+
+def set_id(id: int):
+    st.session_state[id_key] = id
+
+
+def get_id() -> int:
+    if id_key in st.session_state:
+        return st.session_state[id_key]
 
 
 def is_access_token_valid():

@@ -3,7 +3,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
-from frontend.NetworkService import *
+import streamlit as st
+import frontend.NetworkService
+import frontend.SessionService
 
 
 def auth_ui():
@@ -21,7 +23,7 @@ def auth_ui():
         login_button = st.button("Log in")
 
         if login_button:
-            tokens = login(login_username, login_password)
+            tokens = frontend.NetworkService.login(login_username, login_password)
             if tokens[0]:
                 st.rerun()
             else:
@@ -35,11 +37,11 @@ def auth_ui():
         reg_button = st.button("Create account")
 
         if reg_button:
-            result = register(email=reg_email, username=reg_username, password=reg_password)
+            result = frontend.NetworkService.register(email=reg_email, username=reg_username, password=reg_password)
             if result[0]:
                 st.success("You have successfully registered!")
 
-                tokens = login(reg_username, reg_password)
+                tokens = frontend.NetworkService.login(reg_username, reg_password)
                 if tokens[0]:
                     st.rerun()
                 else:
@@ -52,7 +54,8 @@ def auth_ui():
 def profile_ui():
     st.title('Profile')
 
-    data = get_user_info()
+    data = frontend.NetworkService.get_user_info()
+    frontend.SessionService.set_id(data[1]["id"])
     if data[0]:
         username = data[1]["username"]
         password = data[1]["password"]
@@ -70,7 +73,7 @@ def profile_ui():
         st.error(data[1])
 
 
-if get_access_token():
+if frontend.SessionService.get_access_token():
     profile_ui()
 else:
     auth_ui()
