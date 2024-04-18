@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from backend.entity.feedback import Feedback
 from backend.entity.feedback import FeedbackPage
 from backend.entity.user import User
-from backend.entity.link import Link
+from backend.entity.thread import Thread, ThreadFeedback
 
 
 class StandardResponse(BaseModel):
@@ -13,7 +12,7 @@ class StandardResponse(BaseModel):
 
 class FeedbackListResponse(BaseModel):
     success: bool
-    feedback: List[Feedback]
+    feedback: List[ThreadFeedback]
 
 
 class FeedbackResponse(BaseModel):
@@ -28,4 +27,4 @@ class UserInfoResponse(BaseModel):
 
 class ThreadResponse(BaseModel):
     success: bool
-    threads: Optional[List[Link]] = None
+    threads: Optional[List[Thread]] = None

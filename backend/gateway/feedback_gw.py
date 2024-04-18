@@ -62,3 +62,17 @@ class FeedbackGw(DatabaseGw):
         self.cursor.execute('UPDATE Feedback SET comment = ? WHERE id = ?',
                             (comment, str(feedback_id)))
         self.con.commit()
+
+    async def get_first_feedback(self, link_id):
+        self.cursor.execute('SELECT * FROM Feedback '
+                            'WHERE link_id = ? '
+                            'ORDER BY id ASC LIMIT 1',
+                            (str(link_id),))
+        feedback = self.cursor.fetchone()
+        if feedback is None:
+            return feedback
+        return Feedback(id=feedback[0],
+                        user_id=feedback[1],
+                        link_id=feedback[2],
+                        comment=feedback[3],
+                        date=feedback[4])

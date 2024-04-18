@@ -12,6 +12,7 @@ from backend.entity.responses import ThreadResponse, StandardResponse
 from backend.entity.responses import FeedbackListResponse
 import logging
 from fastapi import Security
+from backend.entity.thread import Thread, ThreadFeedback
 
 from backend.gateway.user_gw import UserGw
 from backend.utils.auth import get_current_user
@@ -29,6 +30,8 @@ async def search(
         limit: Optional[int] = 10,
 ) -> ThreadResponse:
     linkGw = LinkGw(request.app.state.db)
+    feedbackGw = FeedbackGw(request.app.state.db)
+    userGw = UserGw(request.app.state.db)
 
     if query is None:
         result = await linkGw.get_latest(limit)
@@ -41,6 +44,9 @@ async def search(
         # Search link by url
         try:
             link_data = await linkGw.get_link_data_by_link(query)
+            feedback = await feedbackGw.get_first_feedback(link_data.id)
+            username = await userGw.get_username_by_id(feedback.user_id)
+
             if link_data is None:
                 return ThreadResponse(success=False, threads=[])
 
@@ -50,12 +56,24 @@ async def search(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return ThreadResponse(success=True, threads=[link_data])
+        return ThreadResponse(success=True,
+                              threads=[Thread(username=username,
+                                              link=link_data,
+                                              date=feedback.date)])
     else:
         try:
             # Search urls by matches in platform or title strings
             links = await linkGw.get_links_by_query(query)
-            return ThreadResponse(success=len(links) > 0, threads=links)
+            result = []
+            for link in links:
+                feedback = await feedbackGw.get_first_feedback(link.id)
+                username = await userGw.get_username_by_id(feedback.user_id)
+
+                result.append(Thread(username=username,
+                                     link=link,
+                                     date=feedback.date))
+
+            return ThreadResponse(success=len(links) > 0, threads=result)
 
         except Exception as e:
             logging.error(f"error in getting links: {e}")
@@ -72,10 +90,15 @@ async def get(
         link_id: int,
 ) -> FeedbackListResponse:
     feedbackGw = FeedbackGw(request.app.state.db)
+    userGw = UserGw(request.app.state.db)
     try:
         feedback_list = await feedbackGw.get_feedback_list(link_id)
+        result = []
+        for feedback in feedback_list:
+            username = await userGw.get_username_by_id(feedback.user_id)
+            result.append(ThreadFeedback(username=username, feedback=feedback))
         return FeedbackListResponse(success=len(feedback_list) > 0,
-                                    feedback=feedback_list)
+                                    feedback=result)
 
     except Exception as e:
         logging.error(f"error in getting feedback: {e}")
