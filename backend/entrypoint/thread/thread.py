@@ -8,12 +8,12 @@ from backend.entity.user import User
 from backend.gateway.feedback_gw import FeedbackGw
 from backend.gateway.link_gw import LinkGw
 from fastapi import Request, status, HTTPException
-from backend.entity.responses import ThreadResponse, StandardResponse
+from backend.entity.responses import ThreadResponse
 from backend.entity.responses import FeedbackListResponse
 import logging
 from fastapi import Security
 from backend.entity.thread import Thread, ThreadFeedback
-
+from backend.entity.link import Link
 from backend.gateway.user_gw import UserGw
 from backend.utils.auth import get_current_user
 
@@ -118,12 +118,12 @@ async def get(
 
 
 @router.post("/create", summary="create thread",
-             response_model=StandardResponse)
+             response_model=ThreadResponse)
 async def create(
         body: requests.CreateThreadRequest,
         request: Request,
         user: User = Security(get_current_user)
-) -> StandardResponse:
+) -> ThreadResponse:
     userGw = UserGw(request.app.state.db)
     linkGw = LinkGw(request.app.state.db)
     feedbackGw = FeedbackGw(request.app.state.db)
@@ -134,10 +134,17 @@ async def create(
     if link_data is None:
         try:
             link_id = await linkGw.add_link(body)
-            await feedbackGw.add_feedback(Feedback(user_id=user_data.id,
-                                                   link_id=link_id,
-                                                   comment=body.comment))
-            return StandardResponse(success=True, error="")
+            date = await feedbackGw.add_feedback(Feedback(user_id=user_data.id,
+                                                          link_id=link_id,
+                                                          comment=body.comment)
+                                                 )
+            return ThreadResponse(success=True,
+                                  threads=[Thread(username=user_data.username,
+                                                  link=Link(id=link_id,
+                                                            link=body.link,
+                                                            title=body.title,
+                                                            platform=body.platform),  # noqa: E501
+                                                  date=date)])
 
         except Exception as e:
             logging.error(f"error in creating thread: {e}")
@@ -146,5 +153,7 @@ async def create(
             )
 
     else:
-        return StandardResponse(success=False,
-                                error="Such thread already exist")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="such thread already exists"
+        )

@@ -10,15 +10,17 @@ DATE_FORMAT = "%Y-%m-%d"
 
 class FeedbackGw(DatabaseGw):
     async def add_feedback(self, feedback_data):
+        date = datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(  # noqa: E501
+                                 FEEDBACK_DATETIME_FORMAT)  # noqa: E501
         self.cursor.execute('INSERT INTO Feedback '
                             '(user_id, link_id, comment, date) '
                             'VALUES (?, ?, ?, datetime(?))',
                             (feedback_data.user_id,
                              feedback_data.link_id,
                              feedback_data.comment,
-                             datetime.now(tz=ZoneInfo('Europe/Moscow')).strftime(  # noqa: E501
-                                 FEEDBACK_DATETIME_FORMAT)))  # noqa: E501
+                             date))
         self.con.commit()
+        return date
 
     async def get_feedback_by_id(self, feedback_id: int):
         self.cursor.execute('SELECT * FROM Feedback '
