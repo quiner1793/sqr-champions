@@ -17,6 +17,7 @@ flake8 = "^7.0.0"
 
 # front
 streamlit = "^1.33.0"
+beautifulsoup4 = "^4.12.3"
 
 
 
