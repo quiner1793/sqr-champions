@@ -75,7 +75,7 @@ def create_thread(link: str, title: str, platform: str, comment: str):
     except:
         pass
 
-    return response.json()["success"], response.json()["error"]
+    return response.json()["success"], SearchThread(response.json()["threads"][0])
 
 
 def search(url: bool, query: str) -> [SearchThread]:
@@ -134,19 +134,12 @@ def edit_feedback(feedback_id, comment) -> (bool, str):
 
 
 def get_content_details_from_url(url):
-    # Отправляем запрос к указанной URL и получаем содержимое страницы
     response = requests.get(url)
-    # Проверяем успешность запроса
     if response.status_code == 200:
-        # Используем BeautifulSoup для парсинга HTML
         soup = BeautifulSoup(response.content, 'html.parser')
-        # Находим необходимые элементы на странице и извлекаем данные
-        unique_id = url  # Уникальный ID можно использовать как саму URL
-        platform = re.search(r'(?<=://)(.*?)(?=/|$)', url).group(0)  # Платформа извлекается из URL
-        name = soup.title.text.strip()  # Название контента из заголовка страницы
-        # Возвращаем полученные данные
+        platform = re.search(r'(?<=://)(.*?)(?=/|$)', url).group(0)
+        name = soup.title.text.strip()
         return platform, name
     else:
-        # Если запрос неудачный, выводим сообщение об ошибке
         print("Failed to fetch content from URL:", url)
         return None
