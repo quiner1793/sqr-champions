@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sqr-champions"
+version = "0.1.0"
+description = ""
+authors = ["SHREDDING8 <zavrazhnov.zhora@mail.ru>", "ananastya1 <nastya10_tv@mail.ru>"]
+readme = "../README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.12"
+validators = "^0.28.0"
+streamlit = "^1.33.0"
+beautifulsoup4 = "^4.12.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

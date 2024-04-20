@@ -10,6 +10,8 @@ workers = int(os.getenv("SERVER_WORKERS", 1))
 bind = f"{host}:{port}"
 keepalive = int(os.getenv("SERVER_KEEPALIVE", 5))
 timeout = int(os.getenv("SERVER_TIMEOUT", 30))
+accesslog = "-"
+errorlog = "-"
 
 # For debugging and testing
 log_data = {
@@ -18,5 +20,7 @@ log_data = {
     "bind": bind,
     "keepalive": keepalive,
     "timeout": timeout,
+    "accesslog": accesslog,
+    "errorlog": errorlog,
 }
 print(json.dumps(log_data))

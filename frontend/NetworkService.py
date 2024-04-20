@@ -4,8 +4,9 @@ import re
 import requests
 import SessionService
 from bs4 import BeautifulSoup
+from config import config
 
-API_URL = "http://127.0.0.1:8080"
+API_URL = f"http://{config.server_host}:{config.server_port}"
 
 
 class SearchThread:
