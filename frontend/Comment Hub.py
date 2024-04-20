@@ -6,18 +6,13 @@ from NetworkService import create_thread, search, get_thread_details
 import SessionService
 import validators
 
-
 import NetworkService
 
 
 def search_ui():
     col1, col2 = st.columns([0.75, 0.25])
-
-    # Первая колонка (пустая) для смещения второй колонки вправо
     with col1:
         st.title('Сomment Hub')
-
-    # Вторая колонка для кнопки
     with col2:
         if st.button('Create new thread'):
             SessionService.main_page_state = MainPageState.NEW_THREAD
@@ -27,7 +22,6 @@ def search_ui():
 
     search_button = st.button("Find")
 
-    # Отображение результатов
     if len(searchResults) > 0:
         for index, feedback in enumerate(searchResults):
             st.markdown(f" ### {feedback.title}")
@@ -39,7 +33,7 @@ def search_ui():
             with col1:
                 st.write(f"{feedback.date}")
             with col2:
-                if st.button('Show thread', key=f"thread_{index}"):  # ID THREAD
+                if st.button('Show thread', key=f"thread_{index}"):
                     SessionService.main_page_state = MainPageState.THREAD_DETAIL
 
                     SessionService.selectedThread = Thread(feedback.link_id,
@@ -71,8 +65,8 @@ def new_thread():
             time.sleep(0.5)
             SessionService.main_page_state = MainPageState.THREAD_DETAIL
 
-            # TODO createThread
-            SessionService.selectedThread = Thread(0, url, platform, content_title, "Me", "123")
+            SessionService.selectedThread = Thread(response[1].link_id, response[1].link, response[1].platform,
+                                                   response[1].title, response[1].username, response[1].date)
             st.rerun()
         else:
             st.error(response[1])
@@ -81,22 +75,20 @@ def new_thread():
         SessionService.main_page_state = MainPageState.SEARCH
         st.rerun()
 
-    st.title("Создание нового треда")
+    st.title("Creation of new thread")
 
     url = st.text_input("URL", "")
 
-    # platform = st.selectbox("Платформа", ["YouTube", "Twitch", "Instagram", "Twitter"])
-    # content_title = st.text_input("Название контента", "")
-    comment = st.text_area("Комментарий", "")
+    comment = st.text_area("Feedback", "")
 
-    if st.button("Создать"):
+    if st.button("Create"):
 
         platform, content_title = NetworkService.get_content_details_from_url(url)
 
         if url and platform and content_title and comment:
             create_new_thread(url, platform, content_title, comment)
         else:
-            st.warning("Пожалуйста, заполните все поля!")
+            st.warning("Please fill in all fields!")
 
 
 def thread_title(thread: Thread) -> None:
@@ -114,8 +106,8 @@ def thread_title(thread: Thread) -> None:
 def feedback_title(thread: Thread) -> None:
     st.subheader("Feedback:")
 
-    sort_order = st.radio("Сортировка:", ("По возрастанию даты", "По убыванию даты"))
-    if sort_order == "По возрастанию даты":
+    sort_order = st.radio("Sort by:", ("date ascending", "date descending"))
+    if sort_order == "date ascending":
         thread.comments.sort(key=lambda x: x.date)
     else:
         thread.comments.sort(key=lambda x: x.date, reverse=True)
