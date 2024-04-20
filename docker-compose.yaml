@@ -16,7 +16,7 @@ services:
     ports:
       - "8080"
     volumes:
-      - ${PWD}/database.db:/server/${DB_NAME}
+      - ${HOME}/database.db:/server/${DB_NAME}
   web:
     build:
       dockerfile: web.Dockerfile
