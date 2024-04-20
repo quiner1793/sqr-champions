@@ -2,7 +2,7 @@
 name = "sqr-champions"
 version = "0.1.0"
 description = ""
-authors = ["Lnsfna <alinasafina02@mail.ru>", "SHREDDING8 <zavrazhnov.zhora@mail.ru>", "ananastya1 <nastya10_tv@mail.ru>"]
+authors = ["Lnsfna <alinasafina02@mail.ru>"]
 readme = "../README.md"
 packages = []
 
@@ -17,10 +17,6 @@ validators = "^0.28.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^7.0.0"
-
-# front
-streamlit = "^1.33.0"
-beautifulsoup4 = "^4.12.3"
 
 
 [build-system]
