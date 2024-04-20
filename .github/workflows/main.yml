@@ -15,4 +15,5 @@ jobs:
           AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
+          echo $AUTH_SECRET_KEY
           docker compose up -d
