@@ -10,7 +10,7 @@ services:
       - "SERVER_HOST=0.0.0.0"
       - "SERVER_PORT=8080"
       - "DB_NAME=my_database"
-      - "AUTH_SECRET_KEY=${AUTH_SECRET_KEY}"
+      - "AUTH_SECRET_KEY=asdasdasdasd"
       - "AUTH_TOKEN_EXPIRE=15"
       - "AUTH_REFRESH_TOKEN_EXPIRE=600"
     ports:
