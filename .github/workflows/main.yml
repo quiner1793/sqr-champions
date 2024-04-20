@@ -1,6 +1,9 @@
 name: Python package
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   python:
@@ -11,8 +14,7 @@ jobs:
         run: |
           docker compose build
       - name: Run images
-        env:
-          AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
-          DB_NAME: ${{ secrets.DB_NAME }}
         run: |
+          export AUTH_SECRET_KEY="${{ secrets.AUTH_SECRET_KEY }}" 
+          export DB_NAME="${{ secrets.DB_NAME }}"
           docker compose up -d

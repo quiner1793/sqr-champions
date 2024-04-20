@@ -3,15 +3,29 @@ version: '3.8'
 services:
   fastapi:
     build:
-      dockerfile: Dockerfile
+      dockerfile: server.Dockerfile
     restart: always
     environment:
       # Server
       - "SERVER_HOST=0.0.0.0"
       - "SERVER_PORT=8080"
-      - "DB_NAME=$DB_NAME"
-      - "AUTH_SECRET_KEY=$AUTH_SECRET_KEY"
+      - "DB_NAME=${DB_NAME}"
+      - "AUTH_SECRET_KEY=${AUTH_SECRET_KEY}"
       - "AUTH_TOKEN_EXPIRE=15"
-      - "AUTH_REFRESH_TOKEN_EXPIRE=60"
+      - "AUTH_REFRESH_TOKEN_EXPIRE=600"
     ports:
-      - "8080:8080"
+      - "8080"
+    volumes:
+      - ${HOME}/database.db:/server/${DB_NAME}.db
+  web:
+    build:
+      dockerfile: web.Dockerfile
+    restart: no
+    environment:
+      # Server
+      - "SERVER_HOST=fastapi"
+      - "SERVER_PORT=8080"
+    ports:
+      - "8501:8501"
+    links:
+      - fastapi
