@@ -18,8 +18,9 @@ app.include_router(thread_router, prefix="/thread")
 app.include_router(user_router, prefix="/user")
 
 
-@app.get(
+@app.api_route(
     "/health",
+    methods=['GET', 'HEAD'],
     tags=["healthcheck"],
     summary="Perform a Health Check",
     response_description="Return HTTP Status Code 200 (OK)",
