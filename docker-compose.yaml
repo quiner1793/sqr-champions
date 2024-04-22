@@ -14,7 +14,7 @@ services:
       - "AUTH_TOKEN_EXPIRE=15"
       - "AUTH_REFRESH_TOKEN_EXPIRE=600"
     ports:
-      - "8080"
+      - "8080:8080"
     volumes:
       - ${HOME}/database.db:/server/${DB_NAME}.db
   web:
