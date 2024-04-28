@@ -17,7 +17,8 @@ import logging
 router = APIRouter()
 
 
-@router.post("/token", response_model=Token, include_in_schema=False)
+
+@router.post("/token", response_model=Token, include_in_schema=True)
 async def login(
         request: Request,
         form: OAuth2PasswordRequestForm = Depends(),
