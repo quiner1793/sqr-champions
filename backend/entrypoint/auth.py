@@ -5,6 +5,7 @@ from fastapi import APIRouter, status, HTTPException
 from starlette.requests import Request
 from backend.entity import requests
 from backend.entity.responses import StandardResponse
+from backend.entity.responses import login_responses, register_responses
 from backend.entity.token import Token
 from backend.gateway.user_gw import UserGw
 from fastapi.security import OAuth2PasswordRequestForm
@@ -17,8 +18,7 @@ import logging
 router = APIRouter()
 
 
-
-@router.post("/token", response_model=Token, include_in_schema=True)
+@router.post("/token", response_model=Token, responses={**login_responses})
 async def login(
         request: Request,
         form: OAuth2PasswordRequestForm = Depends(),
@@ -50,7 +50,10 @@ async def login(
     return Token(access_token=access_token, refresh_token=refresh_token)
 
 
-@router.post("/register", summary="Register", response_model=StandardResponse)
+@router.post("/register",
+             summary="Register",
+             response_model=StandardResponse,
+             responses={**register_responses})
 async def register(
         body: requests.RegisterRequest,
         request: Request,
