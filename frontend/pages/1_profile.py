@@ -3,9 +3,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
-import streamlit as st
-import frontend.NetworkService
-import frontend.SessionService
+import streamlit as st  # noqa: E402
+import frontend.NetworkService  # noqa: E402
+import frontend.SessionService  # noqa: E402
 
 
 def auth_ui():
