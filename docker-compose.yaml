@@ -10,6 +10,7 @@ services:
       - "SERVER_HOST=0.0.0.0"
       - "SERVER_PORT=8080"
       - "DB_NAME=${DB_NAME}"
+      - "SERVER_WORKERS=17"
       - "AUTH_SECRET_KEY=${AUTH_SECRET_KEY}"
       - "AUTH_TOKEN_EXPIRE=15"
       - "AUTH_REFRESH_TOKEN_EXPIRE=600"
