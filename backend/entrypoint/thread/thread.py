@@ -9,6 +9,9 @@ from backend.gateway.feedback_gw import FeedbackGw
 from backend.gateway.link_gw import LinkGw
 from fastapi import Request, status, HTTPException
 from backend.entity.responses import ThreadResponse
+from backend.entity.responses import search_thread_responses
+from backend.entity.responses import get_thread_responses
+from backend.entity.responses import create_thread_responses
 from backend.entity.responses import FeedbackListResponse
 import logging
 from fastapi import Security
@@ -22,7 +25,8 @@ router = APIRouter()
 
 @router.get("/search",
             summary="search for threads",
-            response_model=ThreadResponse)
+            response_model=ThreadResponse,
+            responses={**search_thread_responses})
 async def search(
         request: Request,
         url: Optional[bool] = None,
@@ -94,7 +98,8 @@ async def search(
 
 @router.get("/get/{link_id}",
             summary="get thread",
-            response_model=FeedbackListResponse)
+            response_model=FeedbackListResponse,
+            responses={**get_thread_responses})
 async def get(
         request: Request,
         link_id: int,
@@ -118,7 +123,8 @@ async def get(
 
 
 @router.post("/create", summary="create thread",
-             response_model=ThreadResponse)
+             response_model=ThreadResponse,
+             responses={**create_thread_responses})
 async def create(
         body: requests.CreateThreadRequest,
         request: Request,
@@ -155,5 +161,5 @@ async def create(
     else:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="such thread already exists"
+            detail="Such thread already exists"
         )

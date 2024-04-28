@@ -12,12 +12,18 @@ from backend.entity.feedback import Feedback
 from backend.entity.feedback import FeedbackPage
 from backend.entity.responses import StandardResponse
 from backend.entity.responses import FeedbackResponse
+from backend.entity.responses import add_feedback_responses
+from backend.entity.responses import get_feedback_responses
+from backend.entity.responses import edit_feedback_responses
 import logging
 
 router = APIRouter()
 
 
-@router.post("/add", summary="add feedback", response_model=StandardResponse)
+@router.post("/add",
+             summary="add feedback",
+             response_model=StandardResponse,
+             responses={**add_feedback_responses})
 async def add_feedback(
         body: requests.AddFeedbackRequest,
         request: Request,
@@ -43,7 +49,8 @@ async def add_feedback(
 
 @router.get("/get/{feedback_id}",
             summary="get feedback",
-            response_model=FeedbackResponse)
+            response_model=FeedbackResponse,
+            responses={**get_feedback_responses})
 async def get_feedback(
         feedback_id: int,
         request: Request,
@@ -71,7 +78,10 @@ async def get_feedback(
     return FeedbackResponse(success=True, feedback=feedbackPage)
 
 
-@router.post("/edit", summary="edit feedback", response_model=StandardResponse)
+@router.post("/edit",
+             summary="edit feedback",
+             response_model=StandardResponse,
+             responses={**edit_feedback_responses})
 async def edit_feedback(
         body: requests.EditFeedbackRequest,
         request: Request,

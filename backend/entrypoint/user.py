@@ -6,13 +6,13 @@ from backend.entity.user import User
 from fastapi import Security
 from backend.utils.auth import get_current_user
 from backend.gateway.user_gw import UserGw
-from backend.entity.responses import UserInfoResponse
+from backend.entity.responses import UserInfoResponse, user_responses
 
 router = APIRouter()
 
 
 @router.get("/get_info", summary="get user info",
-            response_model=UserInfoResponse)
+            response_model=UserInfoResponse, responses={**user_responses})
 async def get_user_info(
         request: Request,
         user: User = Security(get_current_user)
