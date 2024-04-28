@@ -1,5 +1,7 @@
 version: "1.0"
+bootstrap: |
+  rm -rf .idea
 profile:
-  name: Default
+  name: qodana.recommended
 include:
   - name: VulnerableLibrariesGlobal

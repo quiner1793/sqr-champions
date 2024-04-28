@@ -1,4 +1,4 @@
-name: Qodana
+name: Quality checks
 on:
   workflow_dispatch:
   pull_request:
@@ -7,6 +7,23 @@ on:
       - main
 
 jobs:
+  linters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+      - uses: mdegis/bandit-action@v1.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: "."
+          level: high
+          confidence: high
+          exit_zero: true
   qodana:
     runs-on: ubuntu-latest
     permissions:
