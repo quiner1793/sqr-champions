@@ -37,7 +37,7 @@ def register(email, username, password) -> (bool, str):
     if response.status_code == 200:
         return response.json()['success'], response.json()['error']
 
-    return None
+    return False, response.json()['detail']
 
 
 def login(username, password):
