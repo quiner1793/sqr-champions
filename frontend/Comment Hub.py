@@ -1,8 +1,8 @@
 import time
 
 import streamlit as st
-from SessionService import MainPageState, searchResults, Thread, selectedThread
-from NetworkService import create_thread, search, get_thread_details
+from SessionService import MainPageState, searchResults, Thread
+from NetworkService import create_thread, search
 import SessionService
 import validators
 

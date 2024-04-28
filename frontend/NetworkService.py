@@ -74,7 +74,7 @@ def create_thread(link: str, title: str, platform: str, comment: str):
     try:
         if response.json()["detail"]:
             return False, "You are not logged in :("
-    except:
+    except Exception:
         pass
 
     return response.json()["success"], SearchThread(response.json()["threads"][0])
@@ -116,7 +116,7 @@ def add_feedback(link_id, comment) -> (bool, str):
     try:
         if response.json()["detail"]:
             return False, "You are not logged in :("
-    except:
+    except Exception:
         pass
 
     return response.json()["success"], response.json()["error"]
