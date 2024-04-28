@@ -56,7 +56,10 @@ async def register(
         request: Request,
 ) -> StandardResponse:
     if not validators.email(body.email):
-        return StandardResponse(success=False, error="Invalid email")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid email"
+        )
 
     userGw = UserGw(request.app.state.db)
 
@@ -66,7 +69,10 @@ async def register(
         if err.sqlite_errorcode == sqlite3.SQLITE_CONSTRAINT_UNIQUE:
             field = str(err).replace("UNIQUE constraint failed: Users.", "")
             msg = f"Person with such {field} is already registered"
-            return StandardResponse(success=False, error=msg)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=msg
+            )
         else:
             logging.error(f"error in register user: {err}")
             raise HTTPException(
