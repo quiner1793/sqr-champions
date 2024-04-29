@@ -140,10 +140,11 @@ async def create(
     if link_data is None:
         try:
             link_id = await link_gw.add_link(body)
-            date = await feedback_gw.add_feedback(Feedback(user_id=user_data.id,
-                                                          link_id=link_id,
-                                                          comment=body.comment)
-                                                 )
+            date = await feedback_gw.add_feedback(Feedback(
+                user_id=user_data.id,
+                link_id=link_id,
+                comment=body.comment)
+            )
             return ThreadResponse(success=True,
                                   threads=[Thread(username=user_data.username,
                                                   link=Link(id=link_id,
