@@ -9,6 +9,13 @@ packages = []
 [tool.poetry.dependencies]
 python = "^3.11"
 
+[tool.poetry.group.backend.dependencies]
+python-multipart = "^0.0.9"
+fastapi = "^0.110.1"
+uvicorn = "^0.29.0"
+fastapi-another-jwt-auth = "^0.1.10"
+validators = "^0.28.0"
+
 [tool.poetry.group.frontend.dependencies]
 validators = "^0.28.0"
 streamlit = "^1.33.0"
@@ -16,6 +23,7 @@ beautifulsoup4 = "^4.12.3"
 
 [tool.poetry.group.test.dependencies]
 pytest = ">=7.4.3"
+pytest-cov = "5.0.0"
 selenium = ">=4.16.0"
 selene = "*"
 webdriver-manager= ">=4.0.1"
