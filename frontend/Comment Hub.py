@@ -57,8 +57,8 @@ def search_ui():
 
 
 def new_thread():
-    def create_new_thread(url, platform, content_title, comment):
-        response = create_thread(url, content_title, platform, comment)
+    def create_new_thread(thread_url, thread_platform, thread_content_title, thread_comment):
+        response = create_thread(thread_url, thread_content_title, thread_platform, thread_comment)
 
         if response[0]:
             st.success("Thread created!")

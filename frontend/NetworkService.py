@@ -6,7 +6,6 @@ import SessionService
 from bs4 import BeautifulSoup
 from config import config
 
-
 API_URL = f"http://{config.server_host}:{config.server_port}"
 
 
@@ -74,10 +73,8 @@ def create_thread(link: str, title: str, platform: str, comment: str):
     try:
         if response.json()["detail"]:
             return False, "You are not logged in :("
-    except Exception:
-        pass
-
-    return response.json()["success"], SearchThread(response.json()["threads"][0])
+    except KeyError:
+        return response.json()["success"], SearchThread(response.json()["threads"][0])
 
 
 def search(url: bool, query: str) -> [SearchThread]:
@@ -116,10 +113,8 @@ def add_feedback(link_id, comment) -> (bool, str):
     try:
         if response.json()["detail"]:
             return False, "You are not logged in :("
-    except Exception:
-        pass
-
-    return response.json()["success"], response.json()["error"]
+    except KeyError:
+        return response.json()["success"], response.json()["error"]
 
 
 def edit_feedback(feedback_id, comment) -> (bool, str):
