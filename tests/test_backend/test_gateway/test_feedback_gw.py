@@ -2,14 +2,11 @@ import asyncio
 import datetime
 import sqlite3
 from unittest import IsolatedAsyncioTestCase
+from zoneinfo import ZoneInfo
 
 from backend.entity.feedback import Feedback
 from backend.gateway.db_gw import DatabaseGw
 from backend.gateway.feedback_gw import FEEDBACK_DATETIME_FORMAT, FeedbackGw
-
-# from aiounittest import async_test
-
-# import pytest
 
 
 class TestFeedback(IsolatedAsyncioTestCase):
@@ -47,7 +44,6 @@ class TestFeedback(IsolatedAsyncioTestCase):
     def setUp(self) -> None:
         self.connection = sqlite3.connect(":memory:")
         self.db = DatabaseGw(self.connection)
-        # await self.db.create_tables()
         self.await_func(self.db.create_tables())
         self.feedback = FeedbackGw(self.connection)
         self.feedback_data = Feedback(
@@ -72,7 +68,7 @@ class TestFeedback(IsolatedAsyncioTestCase):
             and result[0][3] == self.feedback_data.comment
             and datetime.datetime.strptime(
                 result[0][4], FEEDBACK_DATETIME_FORMAT)
-            < datetime.datetime.now()
+            < datetime.datetime.now(tz=ZoneInfo('Europe/Moscow'))
         )
 
     async def test_get_feedback_by_id(self):

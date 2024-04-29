@@ -1,5 +1,6 @@
 import datetime
 import json
+from zoneinfo import ZoneInfo
 import pytest
 
 from httpx import AsyncClient
@@ -29,7 +30,7 @@ class TestTread:
                 and thread["link"] == link_data
                 and datetime.datetime.strptime(
                     thread["date"], FEEDBACK_DATETIME_FORMAT)
-                < datetime.datetime.now()
+                < datetime.datetime.now(tz=ZoneInfo('Europe/Moscow'))
             )
 
     @pytest.mark.asyncio
