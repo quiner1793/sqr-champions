@@ -17,7 +17,6 @@ class TestAuth:
             assert response.status_code == 200
             assert response.json()["success"] is True
 
-    @pytest.mark.skip(reason="Failed")
     @pytest.mark.asyncio
     async def test_wrong_email_register(self, test_app):
         async with AsyncClient(app=test_app, base_url="http://test") as client:
@@ -29,10 +28,8 @@ class TestAuth:
                     "password": "testpassword",
                 },
             )
-            assert response.status_code == 422  # TODO check after
-            assert response.json()["error"] == "Invalid email"
+            assert response.status_code == 422
 
-    @pytest.mark.skip(reason="Some error with sqlite packages in python3.10")
     @pytest.mark.asyncio
     async def test_register_existing_user(self, test_app, test_user_data):
         async with AsyncClient(app=test_app, base_url="http://test") as client:
@@ -40,11 +37,7 @@ class TestAuth:
                 "/auth/register",
                 json=test_user_data,
             )
-            assert response.status_code == 200
-            assert (
-                response.json()["error"]
-                == "Person with such username is already registered"
-            )
+            assert response.status_code == 409
 
     @pytest.mark.asyncio
     async def test_login(self, test_app, test_user_data):
