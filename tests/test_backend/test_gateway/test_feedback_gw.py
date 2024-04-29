@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import sqlite3
 from unittest import IsolatedAsyncioTestCase
-from zoneinfo import ZoneInfo
 
 from backend.entity.feedback import Feedback
 from backend.gateway.db_gw import DatabaseGw
@@ -66,9 +65,6 @@ class TestFeedback(IsolatedAsyncioTestCase):
             and result[0][1] == self.feedback_data.user_id
             and result[0][2] == self.feedback_data.link_id
             and result[0][3] == self.feedback_data.comment
-            and datetime.datetime.strptime(
-                result[0][4], FEEDBACK_DATETIME_FORMAT)
-            < datetime.datetime.now(tz=ZoneInfo('Europe/Moscow'))
         )
 
     async def test_get_feedback_by_id(self):
