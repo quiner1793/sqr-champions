@@ -1,5 +1,5 @@
 from enum import Enum
-
+from typing import Optional
 import streamlit as st
 import NetworkService
 
@@ -31,7 +31,7 @@ class Thread:
         self.date = date
 
 
-selectedThread: Thread = None
+selectedThread: Optional[Thread] = None
 
 
 def set_access_token(token: str):
@@ -42,8 +42,8 @@ def set_refresh_token(token: str):
     st.session_state[refresh_token_key] = token
 
 
-def set_id(id: int):
-    st.session_state[id_key] = id
+def set_id(user_id: int):
+    st.session_state[id_key] = user_id
 
 
 def get_id() -> int:
