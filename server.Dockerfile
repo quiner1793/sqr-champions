@@ -1,5 +1,5 @@
 # Creating a python base with shared environment variables
-FROM python:3.12-bullseye AS python-base
+FROM 3.11.9-bullseye AS python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
