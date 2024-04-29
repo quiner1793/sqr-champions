@@ -29,15 +29,15 @@ async def add_feedback(
         request: Request,
         user: User = Security(get_current_user)
 ) -> StandardResponse:
-    userGw = UserGw(request.app.state.db)
-    feedbackGw = FeedbackGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
 
-    user_data = await userGw.get_user_by_username(user.username)
+    user_data = await user_gw.get_user_by_username(user.username)
 
     try:
-        await feedbackGw.add_feedback(Feedback(user_id=user_data.id,
-                                               link_id=body.link_id,
-                                               comment=body.comment))
+        await feedback_gw.add_feedback(Feedback(user_id=user_data.id,
+                                                link_id=body.link_id,
+                                                comment=body.comment))
         return StandardResponse(success=True, error="")
 
     except Exception as e:
@@ -55,16 +55,16 @@ async def get_feedback(
         feedback_id: int,
         request: Request,
 ) -> FeedbackResponse:
-    feedbackGw = FeedbackGw(request.app.state.db)
-    linkGw = LinkGw(request.app.state.db)
-    userGw = UserGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
+    link_gw = LinkGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
     try:
-        feedback = await feedbackGw.get_feedback_by_id(feedback_id)
+        feedback = await feedback_gw.get_feedback_by_id(feedback_id)
         if feedback is None:
             return FeedbackResponse(success=False, feedback=feedback)
-        username = await userGw.get_username_by_id(feedback.user_id)
-        link = await linkGw.get_link_data_by_link_id(feedback.link_id)
-        feedbackPage = FeedbackPage(
+        username = await user_gw.get_username_by_id(feedback.user_id)
+        link = await link_gw.get_link_data_by_link_id(feedback.link_id)
+        feedback_page = FeedbackPage(
             id=feedback.id,
             username=username,
             link=link,
@@ -75,7 +75,7 @@ async def get_feedback(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    return FeedbackResponse(success=True, feedback=feedbackPage)
+    return FeedbackResponse(success=True, feedback=feedback_page)
 
 
 @router.post("/edit",
@@ -87,18 +87,18 @@ async def edit_feedback(
         request: Request,
         user: User = Security(get_current_user)
 ) -> StandardResponse:
-    feedbackGw = FeedbackGw(request.app.state.db)
-    userGw = UserGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
 
-    feedback = await feedbackGw.get_feedback_by_id(body.feedback_id)
-    user_data = await userGw.get_user_by_username(user.username)
+    feedback = await feedback_gw.get_feedback_by_id(body.feedback_id)
+    user_data = await user_gw.get_user_by_username(user.username)
     if feedback.user_id != user_data.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
         )
 
     try:
-        await feedbackGw.update_feedback(body.feedback_id, body.comment)
+        await feedback_gw.update_feedback(body.feedback_id, body.comment)
         return StandardResponse(success=True, error="")
 
     except Exception as e:
