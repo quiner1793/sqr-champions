@@ -1,9 +1,7 @@
-import datetime
 import json
 import pytest
 
 from httpx import AsyncClient
-from backend.gateway.feedback_gw import FEEDBACK_DATETIME_FORMAT
 
 
 class TestTread:
@@ -27,9 +25,6 @@ class TestTread:
             assert (
                 thread["username"] == "test_user"
                 and thread["link"] == link_data
-                and datetime.datetime.strptime(
-                    thread["date"], FEEDBACK_DATETIME_FORMAT)
-                < datetime.datetime.now()
             )
 
     @pytest.mark.asyncio

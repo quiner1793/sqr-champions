@@ -7,6 +7,29 @@ on:
       - main
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.8.2'
+      - name: Setup poetry dir
+        working-directory: ./tests
+        run: |
+          export AUTH_SECRET_KEY="${{ secrets.AUTH_SECRET_KEY }}" 
+          export SERVER_PORT=8080
+          export AUTH_TOKEN_EXPIRE=15
+          export AUTH_REFRESH_TOKEN_EXPIRE=600
+          poetry install
+          poetry run pytest --cov ../backend/ --cov-branch --cov-fail-under ${{ env.COVERAGE_THRESHOLD }} ./test_backend/
+        env:
+          COVERAGE_THRESHOLD: 60
   linters:
     runs-on: ubuntu-latest
     steps:
