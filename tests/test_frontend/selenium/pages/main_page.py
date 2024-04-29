@@ -31,4 +31,4 @@ class MainPage(BasePage):
 
     @staticmethod
     def open_thread_page():
-        MainPageLocators.first_element_search.click()
+        MainPageLocators.first_element_search_title.click()

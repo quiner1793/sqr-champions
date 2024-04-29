@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "sql_project"
+version = "0.1.0"
+description = ""
+authors = ["SHREDDING8 <zavrazhnov.zhora@mail.ru>", "ananastya1 <nastya10_tv@mail.ru>"]
+readme = "../README.md"
+packages = []
+
+# [tool.poetry.group.frontend.dependencies]
+# python = ">=3.11"
+# validators = "*"
+# streamlit = "*"
+# beautifulsoup4 = "*"
+
+[tool.poetry.group.test.dependencies]
+python = ">=3.11"
+# pytest = ">=7.4.3"
+# selenium = ">=4.16.0"
+# selene = "*"
+# webdriver-manager= "*"
+# httpx = "*"
+# pytest-asyncio = "*"
+
+[tool.poetry.group.backend.dependencies]
+python = ">=3.11"
+# python-multipart = "*"
+# fastapi = "*"
+# uvicorn = "*"
+# gunicorn = "*"
+# fastapi-another-jwt-auth = "*"
+# validators = "^0.28.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

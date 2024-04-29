@@ -31,44 +31,9 @@ class BasePage:
 
     def is_disappeared(self, how, locator, timeout=4):
         try:
-            WebDriverWait(self.browser, timeout, 1, [TimeoutException]).until_not(
+            WebDriverWait(self.browser, timeout, 1, [TimeoutException]).until_not( # noqa
                 ec.presence_of_element_located((how, locator))
             )
         except TimeoutException:
             return False
         return True
-
-    # @staticmethod
-    # @allure.step("Очищение поля от стандартного значения {text}")
-    # def clear_field_from(field_element: Element, text: str):
-    #     field_element.send_keys(Keys.ARROW_RIGHT)
-    #     for _ in text:
-    #         field_element.send_keys(Keys.BACKSPACE)
-
-    # @staticmethod
-    # @allure.step("Вводится многострочная информация в поле")
-    # def multiline(data_list: list[str], element: Element):
-    #     for el in data_list:
-    #         if el == data_list[-1]:
-    #             element.send_keys(el, Keys.RETURN)
-    #             break
-    #         element.send_keys(el, Keys.ENTER)
-
-    # @staticmethod
-    # @allure.step("Открыть соседнюю вкладку браузера")
-    # def open_next_tab(driver):
-    #     """
-    #     Перемещает "курсор" селениума на соседнюю вкладку.
-    #     """
-    #     wait = WebDriverWait(driver, 10)
-    #     wait.until(ec.number_of_windows_to_be(2))
-    #     driver.switch_to.window(driver.window_handles[1])
-
-    # @staticmethod
-    # @allure.step("Вернуться на предыдущую вкладку")
-    # def back_to_prev_tab(driver):
-    #     """
-    #     Возвращает "курсор" селениума на предыдущую вкладку.
-    #     """
-    #     driver.close()
-    #     driver.switch_to.window(driver.window_handles[0])
