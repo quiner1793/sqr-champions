@@ -1,5 +1,5 @@
 from selene.support.shared.jquery_style import s
-from base_page_locators import BasePageLocators
+from locators.base_page_locators import BasePageLocators
 
 class CreateThreadLocators(BasePageLocators):
     url = s("//*[@id='text_input_2']")

@@ -1,5 +1,5 @@
-from pages.base_page import BasePage
 from locators.sign_in_locators import SignInLocators
+from pages.base_page import BasePage
 
 
 class SignInPage(BasePage):

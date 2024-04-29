@@ -1,16 +1,23 @@
 [tool.poetry]
-name = "sqr-champions"
+name = "sql_project"
 version = "0.1.0"
 description = ""
 authors = ["SHREDDING8 <zavrazhnov.zhora@mail.ru>", "ananastya1 <nastya10_tv@mail.ru>"]
 readme = "../README.md"
 packages = []
 
-[tool.poetry.dependencies]
-python = "^3.11"
+[tool.poetry.group.frontend.dependencies]
+python = ">=3.11"
 validators = "^0.28.0"
 streamlit = "^1.33.0"
 beautifulsoup4 = "^4.12.3"
+
+[tool.poetry.group.test.dependencies]
+python = ">=3.11"
+pytest = ">=7.4.3"
+selenium = ">=4.16.0"
+selene = "*"
+webdriver-manager= ">=4.0.1"
 
 
 [build-system]

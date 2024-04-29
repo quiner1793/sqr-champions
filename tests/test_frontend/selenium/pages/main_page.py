@@ -1,7 +1,7 @@
-from pages.base_page import BasePage
-from selene import be, browser
-from locators.main_page_locators import MainPageLocators
 from config import TABS_URL
+from locators.main_page_locators import MainPageLocators
+from pages.base_page import BasePage
+from selene import browser
 
 
 class MainPage(BasePage):
@@ -24,3 +24,11 @@ class MainPage(BasePage):
     @staticmethod
     def open_profile():
         MainPageLocators.profile_page.click()
+
+    @staticmethod
+    def open_comment_hub():
+        MainPageLocators.comment_hub_page.click()
+
+    @staticmethod
+    def open_thread_page():
+        MainPageLocators.first_element_search.click()
