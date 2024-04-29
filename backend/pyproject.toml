@@ -11,7 +11,7 @@ python = "^3.11"
 python-multipart = "^0.0.9"
 fastapi = "^0.110.1"
 uvicorn = "^0.29.0"
-gunicorn = "^21.2.0"
+gunicorn = "^22.0.0"
 fastapi-another-jwt-auth = "^0.1.10"
 validators = "^0.28.0"
 
