@@ -24,9 +24,9 @@ async def login(
         form: OAuth2PasswordRequestForm = Depends(),
         authorize: AuthJWT = Depends(),
 ):
-    userGw = UserGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
     try:
-        user = await userGw.get_user(form)
+        user = await user_gw.get_user(form)
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -64,10 +64,10 @@ async def register(
             detail="Invalid email"
         )
 
-    userGw = UserGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
 
     try:
-        await userGw.add_user(body)
+        await user_gw.add_user(body)
     except sqlite3.Error as err:
         if err.sqlite_errorcode == sqlite3.SQLITE_CONSTRAINT_UNIQUE:
             field = str(err).replace("UNIQUE constraint failed: Users.", "")

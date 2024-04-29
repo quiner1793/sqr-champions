@@ -17,9 +17,9 @@ async def get_user_info(
         request: Request,
         user: User = Security(get_current_user)
 ) -> UserInfoResponse:
-    userGw = UserGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
     try:
-        user = await userGw.get_user_by_username(user.username)
+        user = await user_gw.get_user_by_username(user.username)
     except Exception as e:
         logging.error(f"error in getting user info: {e}")
         raise HTTPException(

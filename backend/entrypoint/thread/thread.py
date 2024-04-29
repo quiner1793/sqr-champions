@@ -33,17 +33,17 @@ async def search(
         query: Optional[str] = None,
         limit: Optional[int] = 10,
 ) -> ThreadResponse:
-    linkGw = LinkGw(request.app.state.db)
-    feedbackGw = FeedbackGw(request.app.state.db)
-    userGw = UserGw(request.app.state.db)
+    link_gw = LinkGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
 
     if query is None:
-        links = await linkGw.get_latest(limit)
+        links = await link_gw.get_latest(limit)
         result = []
         if len(links) > 0:
             for link in links:
-                feedback = await feedbackGw.get_first_feedback(link.id)
-                username = await userGw.get_username_by_id(feedback.user_id)
+                feedback = await feedback_gw.get_first_feedback(link.id)
+                username = await user_gw.get_username_by_id(feedback.user_id)
                 result.append(Thread(username=username,
                                      link=link,
                                      date=feedback.date))
@@ -56,13 +56,13 @@ async def search(
 
         # Search link by url
         try:
-            link_data = await linkGw.get_link_data_by_link(query)
+            link_data = await link_gw.get_link_data_by_link(query)
 
             if link_data is None:
                 return ThreadResponse(success=False, threads=[])
 
-            feedback = await feedbackGw.get_first_feedback(link_data.id)
-            username = await userGw.get_username_by_id(feedback.user_id)
+            feedback = await feedback_gw.get_first_feedback(link_data.id)
+            username = await user_gw.get_username_by_id(feedback.user_id)
 
         except Exception as e:
             logging.error(f"error in getting link: {e}")
@@ -77,11 +77,11 @@ async def search(
     else:
         try:
             # Search urls by matches in platform or title strings
-            links = await linkGw.get_links_by_query(query)
+            links = await link_gw.get_links_by_query(query)
             result = []
             for link in links:
-                feedback = await feedbackGw.get_first_feedback(link.id)
-                username = await userGw.get_username_by_id(feedback.user_id)
+                feedback = await feedback_gw.get_first_feedback(link.id)
+                username = await user_gw.get_username_by_id(feedback.user_id)
 
                 result.append(Thread(username=username,
                                      link=link,
@@ -104,13 +104,13 @@ async def get(
         request: Request,
         link_id: int,
 ) -> FeedbackListResponse:
-    feedbackGw = FeedbackGw(request.app.state.db)
-    userGw = UserGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
     try:
-        feedback_list = await feedbackGw.get_feedback_list(link_id)
+        feedback_list = await feedback_gw.get_feedback_list(link_id)
         result = []
         for feedback in feedback_list:
-            username = await userGw.get_username_by_id(feedback.user_id)
+            username = await user_gw.get_username_by_id(feedback.user_id)
             result.append(ThreadFeedback(username=username, feedback=feedback))
         return FeedbackListResponse(success=len(feedback_list) > 0,
                                     feedback=result)
@@ -130,17 +130,17 @@ async def create(
         request: Request,
         user: User = Security(get_current_user)
 ) -> ThreadResponse:
-    userGw = UserGw(request.app.state.db)
-    linkGw = LinkGw(request.app.state.db)
-    feedbackGw = FeedbackGw(request.app.state.db)
+    user_gw = UserGw(request.app.state.db)
+    link_gw = LinkGw(request.app.state.db)
+    feedback_gw = FeedbackGw(request.app.state.db)
 
-    user_data = await userGw.get_user_by_username(user.username)
-    link_data = await linkGw.get_link_data_by_link(body.link)
+    user_data = await user_gw.get_user_by_username(user.username)
+    link_data = await link_gw.get_link_data_by_link(body.link)
 
     if link_data is None:
         try:
-            link_id = await linkGw.add_link(body)
-            date = await feedbackGw.add_feedback(Feedback(user_id=user_data.id,
+            link_id = await link_gw.add_link(body)
+            date = await feedback_gw.add_feedback(Feedback(user_id=user_data.id,
                                                           link_id=link_id,
                                                           comment=body.comment)
                                                  )
