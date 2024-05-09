@@ -1,0 +1,12 @@
+name: Docker scanner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scanner:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan Docker configs
+        uses: quiner1793/docker-scanner@v1.0.0
