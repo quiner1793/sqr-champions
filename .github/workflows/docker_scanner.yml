@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Scan Docker configs
-        uses: quiner1793/docker-scanner@v1.0.0
+        uses: quiner1793/docker-scanner@main
